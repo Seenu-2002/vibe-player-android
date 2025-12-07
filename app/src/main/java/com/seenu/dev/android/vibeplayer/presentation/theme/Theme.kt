@@ -12,10 +12,12 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
 
 private val DarkColorScheme = darkColorScheme(
+    primary = ButtonPrimary,
     background = Background,
     surface = Background,
     onPrimary = TextPrimary,
     onSecondary = TextSecondary,
+    outline = Outline
 )
 
 val ColorScheme.buttonPrimary: Color

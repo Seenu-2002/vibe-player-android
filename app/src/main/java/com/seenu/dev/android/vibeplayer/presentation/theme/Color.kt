@@ -10,3 +10,5 @@ val TextSecondary = Color(0xFFA7BBD1)
 val TextDisabled = Color(0xFF4C647C)
 val Background = Color(0xFF0A131D)
 val Accent = Color(0xFFF1FF95)
+
+val Outline = Color(0xFF1A2735)
