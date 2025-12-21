@@ -32,11 +32,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        jvmToolchain(21)
     }
     buildFeatures {
         compose = true
@@ -44,7 +44,8 @@ android {
 }
 
 ksp {
-    arg("KOIN_DEFAULT_MODULE","true")
+    arg("KOIN_LOG_TIMES","true")
+    arg("KOIN_USE_COMPOSE_VIEWMODEL","true")
 }
 
 dependencies {
@@ -67,7 +68,7 @@ dependencies {
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
-    implementation(libs.koin.annotation.compiler)
+    ksp(libs.koin.annotation.compiler)
     implementation(libs.koin.annotation)
 
     // Room
@@ -87,4 +88,11 @@ dependencies {
     // Nav3
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
+
+    // Exoplayer
+    implementation(libs.exoplayer.core)
+    implementation(libs.exoplayer.dash)
+    implementation(libs.exoplayer.ui)
+    implementation(libs.exoplayer.ui.compose)
+    implementation(libs.exoplayer.media3)
 }

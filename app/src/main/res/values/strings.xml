@@ -6,8 +6,9 @@
     <string name="no_music">No music found</string>
     <string name="no_music_msg">Try scanning again or check your folders.</string>
     <string name="scan">Scan</string>
+    <string name="scanning">Scanning</string>
     <string name="scan_again">Scan again</string>
-    <string name="scanning_msg">Scanning your device for music...</string>
+    <string name="scanning_msg">Scanning your device for music…</string>
     <string name="ignore_songs_less_than_duration_msg">Ignore duration less than</string>
     <string name="ignore_songs_less_than_size_msg">Ignore size less than</string>
 </resources>

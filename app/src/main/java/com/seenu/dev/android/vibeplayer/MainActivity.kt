@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             VibePlayerTheme {
                 val backstack = rememberNavBackStack(
-                    Route.MusicList
+                    Route.Permission
                 )
                 VibePlayerNavigation(backstack)
             }

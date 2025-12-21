@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -30,6 +32,7 @@ import com.seenu.dev.android.vibeplayer.R
 import com.seenu.dev.android.vibeplayer.presentation.theme.VibePlayerTheme
 import com.seenu.dev.android.vibeplayer.presentation.theme.bodyLargeMedium
 import com.seenu.dev.android.vibeplayer.presentation.theme.buttonPrimary30
+import com.seenu.dev.android.vibeplayer.presentation.theme.textDisabled
 
 @Preview
 @Composable
@@ -50,6 +53,7 @@ private fun ScanInputsCardPreview() {
             onSizeSelected = {
                 selectedSize = it
             },
+            isScanning = false,
             onScan = {},
         )
     }
@@ -71,6 +75,7 @@ fun ScanInputsCard(
     selectedSize: Size,
     onDurationSelected: (Duration) -> Unit,
     onSizeSelected: (Size) -> Unit,
+    isScanning: Boolean,
     onScan: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -79,6 +84,14 @@ fun ScanInputsCard(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
+        ScanningAnimation(
+            animate = isScanning,
+            modifier = Modifier
+                .size(140.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+
         Text(
             text = stringResource(R.string.ignore_songs_less_than_duration_msg),
             style = MaterialTheme.typography.bodyLargeMedium,
@@ -132,13 +145,27 @@ fun ScanInputsCard(
         }
         Spacer(modifier = Modifier.height(24.dp))
         Button(
+            enabled = !isScanning,
             onClick = onScan
         ) {
-            Text(
-                text = stringResource(R.string.scan),
-                style = MaterialTheme.typography.bodyLargeMedium,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
+            if (isScanning) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = MaterialTheme.colorScheme.textDisabled
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.scanning),
+                    style = MaterialTheme.typography.bodyLargeMedium,
+                    color = MaterialTheme.colorScheme.textDisabled
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.scan),
+                    style = MaterialTheme.typography.bodyLargeMedium,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }
