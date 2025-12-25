@@ -9,11 +9,17 @@ sealed interface Route : NavKey {
     @Serializable
 
     data object Permission : Route
+
     @Serializable
 
     data object MusicList : Route
 
+
     @Serializable
     data class MusicPlayer constructor(val trackId: Long) : Route
+
+    @Serializable
+
+    data object ScanMusic : Route
 
 }

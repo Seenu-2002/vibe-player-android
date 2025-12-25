@@ -17,6 +17,16 @@ interface MusicDao {
     fun getAllScannedTracksFlow(): Flow<List<MusicTrackEntity>>
 
     @Query(
+        "SELECT * FROM music_track_table"
+    )
+    suspend fun getScannedTracks(): List<MusicTrackEntity>
+
+    @Query(
+        "SELECT * FROM music_track_table LIMIT :count OFFSET :offset"
+    )
+    suspend fun getScannedTracks(offset: Int = 0, count: Int = 100): List<MusicTrackEntity>
+
+    @Query(
         "SELECT * FROM music_track_table WHERE id = :id LIMIT 1"
     )
     suspend  fun getTrackById(id: Long): MusicTrackEntity?
@@ -32,7 +42,12 @@ interface MusicDao {
     suspend fun insert(music: List<MusicTrackEntity>)
 
     @Delete
-    suspend fun delete(id: MusicTrackEntity)
+    suspend fun delete(entity: MusicTrackEntity)
+
+    @Query(
+        "DELETE FROM music_track_table WHERE id IN (:ids)"
+    )
+    suspend fun deleteByIds(ids: List<Long>)
 
     @Query(
         "DELETE FROM music_track_table WHERE id NOT IN (:ids)"

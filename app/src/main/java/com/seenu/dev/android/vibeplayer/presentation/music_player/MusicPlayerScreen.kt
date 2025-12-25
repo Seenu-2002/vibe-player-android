@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -21,6 +22,8 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -28,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -37,26 +41,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seenu.dev.android.vibeplayer.R
+import com.seenu.dev.android.vibeplayer.presentation.design_system.TrackImage
 import com.seenu.dev.android.vibeplayer.presentation.design_system.VibePlayerNavIconButton
 import com.seenu.dev.android.vibeplayer.presentation.model.TrackUiModel
 import com.seenu.dev.android.vibeplayer.presentation.theme.VibePlayerTheme
 import com.seenu.dev.android.vibeplayer.presentation.theme.accent
 import com.seenu.dev.android.vibeplayer.presentation.theme.bodyMediumRegular
 import com.seenu.dev.android.vibeplayer.presentation.theme.buttonHover
+import com.seenu.dev.android.vibeplayer.presentation.theme.textDisabled
 import org.koin.compose.viewmodel.koinViewModel
 
 @Preview
 @Composable
 private fun MusicPlayerScreenPreview() {
     VibePlayerTheme {
-        val track = TrackUiModel(
-            id = 1L,
-            name = "505",
-            artistName = "Arctic Monkeys",
-            duration = 215000L,
-            durationLabel = "3:35",
-            filePath = ""
-        )
         MusicPlayerScreen(trackId = 121L, onNavigateUp = {})
     }
 }
@@ -66,6 +64,7 @@ private fun MusicPlayerScreenPreview() {
 fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
     val viewModel: MusicPlayerViewModel = koinViewModel()
     val uiState by viewModel.musicPlayerUiState.collectAsStateWithLifecycle()
+    val trackState = uiState.trackState as? TrackUiState.Found?
 
     LaunchedEffect(trackId) {
         viewModel.onIntent(
@@ -100,34 +99,20 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                     .fillMaxWidth()
                     .weight(1F)
             )
-            val accent = MaterialTheme.colorScheme.accent
-            Box(
+            TrackImage(
+                track = trackState?.track,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1F)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                accent.copy(alpha = .14F),
-                                accent.copy(alpha = .028F),
-                            )
-                        ),
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(70.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_music_placeholder),
-                    contentDescription = null,
-                    modifier = Modifier.matchParentSize(),
-                    contentScale = ContentScale.FillBounds
+                    .clip(MaterialTheme.shapes.small),
+                placeholderPadding = PaddingValues(
+                    70.dp
                 )
-            }
+            )
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = uiState.track?.name ?: "<unknown>",
+                text = trackState?.track?.name ?: "<unknown>",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.fillMaxWidth(),
@@ -136,7 +121,7 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = uiState.track?.artistName ?: "<unknown>",
+                text = trackState?.track?.artistName ?: "<unknown>",
                 style = MaterialTheme.typography.bodyMediumRegular,
                 color = MaterialTheme.colorScheme.onSecondary,
                 modifier = Modifier.fillMaxWidth(),
@@ -151,17 +136,25 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                     .weight(1F)
             )
             PlayerSeekBar(
-                currentDuration = uiState.currentPositionMs,
-                totalDuration = uiState.track?.duration ?: 1L,
+                currentDuration = trackState?.currentPositionMs ?: 0L,
+                totalDuration = trackState?.track?.duration ?: 1L,
                 isPlaying = uiState.isPlaying,
+                hasNext = uiState.hasNext,
+                hasPrevious = uiState.hasPrevious,
                 onPlayPause = {
                     viewModel.onIntent(
                         if (it) MusicPlayerIntent.Play else MusicPlayerIntent.Pause
                     )
                 },
-                onNext = { /*TODO*/ },
-                onPrevious = { /*TODO*/ },
-                onSeekTo = { /*TODO*/ },
+                onNext = {
+                    viewModel.onIntent(MusicPlayerIntent.Next)
+                },
+                onPrevious = {
+                    viewModel.onIntent(MusicPlayerIntent.Previous)
+                },
+                onSeekTo = {
+                    viewModel.onIntent(MusicPlayerIntent.Seek(to = it))
+                },
                 modifier = Modifier
                     .fillMaxWidth()
             )
@@ -169,11 +162,14 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerSeekBar(
     currentDuration: Long,
     totalDuration: Long,
     isPlaying: Boolean,
+    hasNext: Boolean,
+    hasPrevious: Boolean,
     onPlayPause: (Boolean) -> Unit,
     onNext: () -> Unit,
     onPrevious: () -> Unit,
@@ -184,19 +180,33 @@ fun PlayerSeekBar(
         modifier = modifier
             .padding(vertical = 16.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LinearProgressIndicator(
-            progress = {
-                if (totalDuration == 0L) {
-                    0F
-                } else {
-                    currentDuration / totalDuration.toFloat()
-                }
-            },
+        Slider(
             modifier = Modifier.fillMaxWidth(),
-            drawStopIndicator = {},
-            gapSize = (-10).dp,
-            trackColor = MaterialTheme.colorScheme.outline,
-            color = MaterialTheme.colorScheme.onPrimary
+            value = currentDuration.toFloat(),
+            onValueChange = {
+                onSeekTo(it.toLong())
+            },
+            colors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.onPrimary,
+                activeTrackColor = MaterialTheme.colorScheme.onPrimary,
+                inactiveTrackColor = MaterialTheme.colorScheme.outline,
+            ),
+            thumb = {
+
+            },
+            track = { state ->
+                SliderDefaults.Track(
+                    colors = SliderDefaults.colors(
+                        activeTrackColor = MaterialTheme.colorScheme.onPrimary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.outline,
+                    ),
+                    modifier = Modifier.height(6.dp),
+                    sliderState = state,
+                    drawStopIndicator = null,
+                    thumbTrackGapSize = 0.dp,
+                )
+            },
+            valueRange = 0F .. totalDuration.toFloat(),
         )
         Spacer(modifier = Modifier.height(24.dp))
         Row(
@@ -204,10 +214,13 @@ fun PlayerSeekBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
+                enabled = hasPrevious,
                 onClick = onPrevious,
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = MaterialTheme.colorScheme.buttonHover,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    disabledContainerColor = MaterialTheme.colorScheme.buttonHover.copy(.28F),
+                    disabledContentColor = MaterialTheme.colorScheme.textDisabled
                 )
             ) {
                 Icon(
@@ -239,10 +252,13 @@ fun PlayerSeekBar(
             }
 
             IconButton(
+                enabled = hasNext,
                 onClick = onNext,
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = MaterialTheme.colorScheme.buttonHover,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    disabledContainerColor = MaterialTheme.colorScheme.buttonHover.copy(.28F),
+                    disabledContentColor = MaterialTheme.colorScheme.textDisabled
                 )
             ) {
                 Icon(

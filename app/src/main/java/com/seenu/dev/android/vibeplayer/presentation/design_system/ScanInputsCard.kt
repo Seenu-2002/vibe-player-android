@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.seenu.dev.android.vibeplayer.R
+import com.seenu.dev.android.vibeplayer.domain.model.ScanConfig
 import com.seenu.dev.android.vibeplayer.presentation.theme.VibePlayerTheme
 import com.seenu.dev.android.vibeplayer.presentation.theme.bodyLargeMedium
 import com.seenu.dev.android.vibeplayer.presentation.theme.buttonPrimary30
@@ -39,10 +40,10 @@ import com.seenu.dev.android.vibeplayer.presentation.theme.textDisabled
 private fun ScanInputsCardPreview() {
     VibePlayerTheme {
         var selectedDuration by remember {
-            mutableStateOf(Duration.SEC_30)
+            mutableStateOf(ScanConfig.MinDuration.SEC_30)
         }
         var selectedSize by remember {
-            mutableStateOf(Size.KB_100)
+            mutableStateOf(ScanConfig.MinSize.KB_100)
         }
         ScanInputsCard(
             selectedDuration = selectedDuration,
@@ -59,22 +60,12 @@ private fun ScanInputsCardPreview() {
     }
 }
 
-enum class Duration {
-    SEC_30,
-    SEC_60,
-}
-
-enum class Size {
-    KB_100,
-    KB_500,
-}
-
 @Composable
 fun ScanInputsCard(
-    selectedDuration: Duration,
-    selectedSize: Size,
-    onDurationSelected: (Duration) -> Unit,
-    onSizeSelected: (Size) -> Unit,
+    selectedDuration: ScanConfig.MinDuration,
+    selectedSize: ScanConfig.MinSize,
+    onDurationSelected: (ScanConfig.MinDuration) -> Unit,
+    onSizeSelected: (ScanConfig.MinSize) -> Unit,
     isScanning: Boolean,
     onScan: () -> Unit,
     modifier: Modifier = Modifier
@@ -100,19 +91,19 @@ fun ScanInputsCard(
         Spacer(modifier = Modifier.height(12.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             VibePlayerRadioButton(
-                selectedDuration == Duration.SEC_30,
+                selectedDuration == ScanConfig.MinDuration.SEC_30,
                 label = "30s",
                 onClick = {
-                    onDurationSelected(Duration.SEC_30)
+                    onDurationSelected(ScanConfig.MinDuration.SEC_30)
                 },
                 modifier = Modifier.weight(1F)
             )
             Spacer(modifier = Modifier.width(8.dp))
             VibePlayerRadioButton(
-                selectedDuration == Duration.SEC_60,
+                selectedDuration == ScanConfig.MinDuration.SEC_60,
                 label = "60s",
                 onClick = {
-                    onDurationSelected(Duration.SEC_60)
+                    onDurationSelected(ScanConfig.MinDuration.SEC_60)
                 },
                 modifier = Modifier.weight(1F)
             )
@@ -126,19 +117,19 @@ fun ScanInputsCard(
         Spacer(modifier = Modifier.height(12.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             VibePlayerRadioButton(
-                selected = selectedSize == Size.KB_100,
+                selected = selectedSize == ScanConfig.MinSize.KB_100,
                 label = "100KB",
                 onClick = {
-                    onSizeSelected(Size.KB_100)
+                    onSizeSelected(ScanConfig.MinSize.KB_100)
                 },
                 modifier = Modifier.weight(1F)
             )
             Spacer(modifier = Modifier.width(8.dp))
             VibePlayerRadioButton(
-                selected = selectedSize == Size.KB_500,
+                selected = selectedSize == ScanConfig.MinSize.KB_500,
                 label = "500KB",
                 onClick = {
-                    onSizeSelected(Size.KB_500)
+                    onSizeSelected(ScanConfig.MinSize.KB_500)
                 },
                 modifier = Modifier.weight(1F)
             )
@@ -146,7 +137,8 @@ fun ScanInputsCard(
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             enabled = !isScanning,
-            onClick = onScan
+            onClick = onScan,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             if (isScanning) {
                 CircularProgressIndicator(
@@ -188,8 +180,7 @@ fun VibePlayerRadioButton(
                 1.dp,
                 strokeColor,
                 CircleShape
-            )
-            .padding(8.dp), verticalAlignment = Alignment.CenterVertically
+            ), verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
             selected = selected,

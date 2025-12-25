@@ -6,6 +6,7 @@ data class Track constructor(
     val name: String,
     val filePath: String,
     val artist: String?,
+    val albumId: Long,
     val album: String?,
     val size: Long,
     val duration: Long

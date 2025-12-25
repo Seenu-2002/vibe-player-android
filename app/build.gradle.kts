@@ -95,4 +95,10 @@ dependencies {
     implementation(libs.exoplayer.ui)
     implementation(libs.exoplayer.ui.compose)
     implementation(libs.exoplayer.media3)
+
+    // Datastore
+    implementation(libs.datastore.preferences)
+
+    // Coil
+    implementation(libs.coil)
 }

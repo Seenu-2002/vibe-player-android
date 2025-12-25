@@ -7,6 +7,10 @@ interface MusicRepository {
 
     fun getAllScannedTracksFlow(): Flow<List<Track>>
 
+    suspend fun getAllScannedTracks(): List<Track>
+
+    suspend fun getScannedTracks(offset: Int, count: Int): List<Track>
+
     suspend fun getTrackById(trackId: Long): Track?
 
     suspend fun updateScannedMusicList(musicList: List<Track>)
@@ -15,5 +19,7 @@ interface MusicRepository {
         minDurationSeconds: Long,
         minFileSizeInKb: Long
     ): List<Track>
+
+    suspend fun deleteTrackByIds(vararg trackId: Long)
 
 }

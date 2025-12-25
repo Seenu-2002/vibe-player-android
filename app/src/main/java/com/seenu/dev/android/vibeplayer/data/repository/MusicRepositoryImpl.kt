@@ -9,8 +9,6 @@ import com.seenu.dev.android.vibeplayer.domain.model.Track
 import com.seenu.dev.android.vibeplayer.domain.repository.MusicRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
@@ -24,6 +22,14 @@ class MusicRepositoryImpl constructor(
     override fun getAllScannedTracksFlow(): Flow<List<Track>> {
         return database.musicDao.getAllScannedTracksFlow()
             .map { list -> list.map(MusicTrackEntity::toDomain) }
+    }
+
+    override suspend fun getAllScannedTracks(): List<Track> {
+        return database.musicDao.getScannedTracks().map { it.toDomain() }
+    }
+
+    override suspend fun getScannedTracks(offset: Int, count: Int): List<Track> {
+        return database.musicDao.getScannedTracks(offset, count).map { it.toDomain() }
     }
 
     override suspend fun getTrackById(trackId: Long): Track? {
@@ -44,6 +50,10 @@ class MusicRepositoryImpl constructor(
                 minFileSizeInBytes = minFileSizeInKb * 1024
             ).map { it.toDomain() }
         }
+    }
+
+    override suspend fun deleteTrackByIds(vararg trackId: Long) {
+        database.musicDao.deleteByIds(trackId.toList())
     }
 
 }

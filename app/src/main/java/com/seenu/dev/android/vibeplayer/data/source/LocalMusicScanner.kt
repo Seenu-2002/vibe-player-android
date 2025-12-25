@@ -27,6 +27,7 @@ class LocalMusicScanner constructor(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.DISPLAY_NAME,
             MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DATA,
@@ -35,7 +36,6 @@ class LocalMusicScanner constructor(
             MediaStore.Audio.Media.MIME_TYPE,
             MediaStore.Audio.Media.IS_MUSIC,
             MediaStore.Audio.Media.TRACK,
-            MediaStore.Audio.Media.ALBUM,
         )
         val selection = """
             ${MediaStore.Audio.Media.IS_MUSIC} = 1
@@ -65,6 +65,7 @@ class LocalMusicScanner constructor(
             val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
             val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
             val path = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+            val albumId = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
 
             var i = 1L
             while (cursor.moveToNext()) {
@@ -75,11 +76,13 @@ class LocalMusicScanner constructor(
                 val duration = cursor.getLong(durationColumn)
                 val size = cursor.getLong(sizeColumn)
                 val dataPath = cursor.getString(path)
+                val albumId = cursor.getLong(albumId)
                 musicList.add(
                     MusicTrackEntity(
                         musicId = id,
                         name = name,
                         artist = artist,
+                        albumId = albumId,
                         album = album,
                         size = size,
                         path = dataPath,

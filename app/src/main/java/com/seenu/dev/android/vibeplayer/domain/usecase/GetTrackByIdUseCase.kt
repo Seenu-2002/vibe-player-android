@@ -5,7 +5,7 @@ import com.seenu.dev.android.vibeplayer.domain.repository.MusicRepository
 import org.koin.core.annotation.Single
 
 @Single
-class GetTrackUseCase constructor(
+class GetTrackByIdUseCase constructor(
     private val repository: MusicRepository
 ) {
 

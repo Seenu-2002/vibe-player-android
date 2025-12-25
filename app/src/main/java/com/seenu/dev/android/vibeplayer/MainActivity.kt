@@ -12,18 +12,21 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import com.seenu.dev.android.vibeplayer.presentation.navigation.Route
 import com.seenu.dev.android.vibeplayer.presentation.navigation.VibePlayerNavigation
 import com.seenu.dev.android.vibeplayer.presentation.theme.VibePlayerTheme
+import com.seenu.dev.android.vibeplayer.presentation.utils.PermissionUtils
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val route: Route = if (PermissionUtils().hasRequiredPermissions(this)) {
+            Route.MusicList
+        } else {
+            Route.Permission
+        }
         setContent {
             VibePlayerTheme {
-                val backstack = rememberNavBackStack(
-                    Route.Permission
-                )
-                VibePlayerNavigation(backstack)
+                VibePlayerNavigation(route)
             }
         }
     }

@@ -13,6 +13,7 @@ fun MusicTrackEntity.toDomain(): Track {
         artist = this.artist,
         album = this.album,
         size = this.size,
+        albumId = this.albumId,
         duration = this.duration
     )
 }
@@ -24,6 +25,7 @@ fun Track.toEntity(): MusicTrackEntity {
         name = this.name,
         path = this.filePath,
         artist = this.artist,
+        albumId = this.albumId,
         album = this.album,
         size = this.size,
         duration = this.duration

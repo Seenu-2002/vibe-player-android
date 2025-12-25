@@ -11,4 +11,5 @@
     <string name="scanning_msg">Scanning your device for music…</string>
     <string name="ignore_songs_less_than_duration_msg">Ignore duration less than</string>
     <string name="ignore_songs_less_than_size_msg">Ignore size less than</string>
+    <string name="scan_results_message">Scan completed! %1$s songs found.</string>
 </resources>

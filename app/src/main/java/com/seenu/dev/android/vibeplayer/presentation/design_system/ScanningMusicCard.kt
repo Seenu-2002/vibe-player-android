@@ -10,9 +10,13 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,13 +31,16 @@ import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.seenu.dev.android.vibeplayer.R
 import com.seenu.dev.android.vibeplayer.presentation.theme.Accent
 import com.seenu.dev.android.vibeplayer.presentation.theme.VibePlayerTheme
 import com.seenu.dev.android.vibeplayer.presentation.theme.accent
-import java.util.Collections.rotate
+import com.seenu.dev.android.vibeplayer.presentation.theme.bodyMediumRegular
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -47,7 +54,19 @@ private fun ScanningMusicCardPreview() {
 
 @Composable
 fun ScanningMusicCard(modifier: Modifier = Modifier) {
-
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        ScanningAnimation(animate = true, modifier = Modifier.size(140.dp))
+        Text(
+            text = stringResource(R.string.scanning_msg),
+            style = MaterialTheme.typography.bodyMediumRegular,
+            color = MaterialTheme.colorScheme.onSecondary,
+            textAlign = TextAlign.Center
+        )
+    }
 }
 
 @Preview
@@ -91,7 +110,7 @@ fun ScanningAnimation(animate: Boolean, startAngle: Float = 270F, modifier: Modi
         var radius = size.minDimension / 2F
         val count = 4
         val spaceBetweenCircles = (radius - innerCircleRadius) / count
-        for (i in 1 .. count) {
+        for (i in 1..count) {
             val (style, color) = when (i) {
                 2 -> Stroke(thickCircleWidth) to accent
                 else -> Stroke(circleWidth) to accent10
@@ -111,7 +130,7 @@ fun ScanningAnimation(animate: Boolean, startAngle: Float = 270F, modifier: Modi
             size.height / 2F,
         )
         val r = (size.minDimension / 2F) - spaceBetweenCircles
-        val end  = Offset(
+        val end = Offset(
             center.x + (r * cos(theta).toFloat()),
             center.y + (r * sin(theta).toFloat()),
         )

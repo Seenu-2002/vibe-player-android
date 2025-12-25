@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seenu.dev.android.vibeplayer.presentation.design_system.PermissionRequiredCard
 import com.seenu.dev.android.vibeplayer.presentation.utils.openAppSettings
 import kotlinx.coroutines.flow.collectLatest
@@ -23,6 +25,9 @@ import org.koin.androidx.compose.koinViewModel
 fun PermissionScreen(onAllowed: () -> Unit) {
 
     val viewModel: PermissionViewModel = koinViewModel()
+    val isUserDeclinedPermission by viewModel.isUserDeniedStoragePermission.collectAsStateWithLifecycle(
+        false
+    )
 
     LaunchedEffect(Unit) {
         viewModel.hasAccessToFiles.collectLatest {
@@ -73,7 +78,7 @@ fun PermissionScreen(onAllowed: () -> Unit) {
                     if (shouldShowRationale) {
                         permissionResultLauncher.launch(permission)
                     } else {
-                        if (!viewModel.isUserDeclinedPermission()) {
+                        if (!isUserDeclinedPermission) {
                             permissionResultLauncher.launch(permission)
                         } else {
                             activity.openAppSettings()
