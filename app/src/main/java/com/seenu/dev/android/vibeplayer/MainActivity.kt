@@ -4,44 +4,50 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.seenu.dev.android.vibeplayer.ui.theme.VibePlayerTheme
+import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation3.runtime.rememberNavBackStack
+import com.seenu.dev.android.vibeplayer.presentation.design_system.dimension.LocalDimensions
+import com.seenu.dev.android.vibeplayer.presentation.design_system.dimension.mobileDimensions
+import com.seenu.dev.android.vibeplayer.presentation.design_system.dimension.tabletDimensions
+import com.seenu.dev.android.vibeplayer.presentation.navigation.Route
+import com.seenu.dev.android.vibeplayer.presentation.navigation.VibePlayerNavigation
+import com.seenu.dev.android.vibeplayer.presentation.theme.VibePlayerTheme
+import com.seenu.dev.android.vibeplayer.presentation.utils.PermissionUtils
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val route: Route = if (PermissionUtils().hasRequiredPermissions(this)) {
+            Route.MusicList
+        } else {
+            Route.Permission
+        }
         setContent {
-            VibePlayerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val isTablet = this.maxWidth >= 840.dp
+                val dimension = if (isTablet) {
+                    tabletDimensions
+                } else {
+                    mobileDimensions
+                }
+                CompositionLocalProvider(LocalDimensions provides dimension) {
+                    VibePlayerTheme {
+                        VibePlayerNavigation(route)
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    VibePlayerTheme {
-        Greeting("Android")
     }
 }

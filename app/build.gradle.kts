@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -30,15 +32,20 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        jvmToolchain(21)
     }
     buildFeatures {
         compose = true
     }
+}
+
+ksp {
+    arg("KOIN_LOG_TIMES","true")
+    arg("KOIN_USE_COMPOSE_VIEWMODEL","true")
 }
 
 dependencies {
@@ -57,4 +64,44 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    ksp(libs.koin.annotation.compiler)
+    implementation(libs.koin.annotation)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    // Kotlin Serialization
+    implementation(libs.kotlinx.serialization.json)
+
+    // Timber
+    implementation(libs.timber)
+
+    // Splash screen API
+    implementation(libs.core.splashscreen)
+
+    // Nav3
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+
+    // Exoplayer
+    implementation(libs.exoplayer.core)
+    implementation(libs.exoplayer.dash)
+    implementation(libs.exoplayer.ui)
+    implementation(libs.exoplayer.ui.compose)
+    implementation(libs.exoplayer.media3)
+
+    // Datastore
+    implementation(libs.datastore.preferences)
+
+    // Coil
+    implementation(libs.coil)
+
+    // Window class
+    implementation(libs.window.size)
 }
