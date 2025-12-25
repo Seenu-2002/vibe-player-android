@@ -11,6 +11,7 @@ import com.seenu.dev.android.vibeplayer.domain.usecase.ScanMusicConfig
 import com.seenu.dev.android.vibeplayer.domain.usecase.ScanMusicInDiskUseCase
 import com.seenu.dev.android.vibeplayer.presentation.mapper.toUiModel
 import com.seenu.dev.android.vibeplayer.presentation.model.TrackUiModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -71,6 +72,7 @@ class MusicListViewModel constructor(
                         minDurationInSeconds = 30,
                         minSizeInKb = 500
                     )
+                    delay(500) // To show loading state
                     markInitialTrackScanCompletedUseCase()
                     scanMusicUseCase(
                         config = config

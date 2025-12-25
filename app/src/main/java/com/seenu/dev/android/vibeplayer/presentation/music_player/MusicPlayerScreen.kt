@@ -1,6 +1,7 @@
 package com.seenu.dev.android.vibeplayer.presentation.music_player
 
 import android.R.attr.track
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seenu.dev.android.vibeplayer.R
 import com.seenu.dev.android.vibeplayer.presentation.design_system.TrackImage
 import com.seenu.dev.android.vibeplayer.presentation.design_system.VibePlayerNavIconButton
+import com.seenu.dev.android.vibeplayer.presentation.design_system.dimension.LocalDimensions
 import com.seenu.dev.android.vibeplayer.presentation.model.TrackUiModel
 import com.seenu.dev.android.vibeplayer.presentation.theme.VibePlayerTheme
 import com.seenu.dev.android.vibeplayer.presentation.theme.accent
@@ -66,6 +69,11 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
     val uiState by viewModel.musicPlayerUiState.collectAsStateWithLifecycle()
     val trackState = uiState.trackState as? TrackUiState.Found?
 
+    BackHandler(true) {
+        viewModel.onIntent(MusicPlayerIntent.Pause)
+        onNavigateUp()
+    }
+
     LaunchedEffect(trackId) {
         viewModel.onIntent(
             MusicPlayerIntent.PrepareAndPlay(
@@ -81,17 +89,22 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                 title = {},
                 navigationIcon = {
                     VibePlayerNavIconButton(
-                        onClick = onNavigateUp
+                        onClick = {
+                            viewModel.onIntent(MusicPlayerIntent.Pause)
+                            onNavigateUp()
+                        }
                     )
                 }
             )
         }
     ) { innerPadding ->
+        val horizontalPadding =
+            LocalDimensions.current.musicPlayerScreenDimensions.horizontalPadding
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(12.dp),
+                .padding(vertical = 12.dp, horizontal = horizontalPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(
@@ -102,6 +115,7 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
             TrackImage(
                 track = trackState?.track,
                 modifier = Modifier
+                    .widthIn(max = 320.dp)
                     .fillMaxWidth()
                     .aspectRatio(1F)
                     .clip(MaterialTheme.shapes.small),
@@ -109,7 +123,7 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                     70.dp
                 )
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = trackState?.track?.name ?: "<unknown>",
@@ -206,7 +220,7 @@ fun PlayerSeekBar(
                     thumbTrackGapSize = 0.dp,
                 )
             },
-            valueRange = 0F .. totalDuration.toFloat(),
+            valueRange = 0F..totalDuration.toFloat(),
         )
         Spacer(modifier = Modifier.height(24.dp))
         Row(

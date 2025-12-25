@@ -101,4 +101,7 @@ dependencies {
 
     // Coil
     implementation(libs.coil)
+
+    // Window class
+    implementation(libs.window.size)
 }

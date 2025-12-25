@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
@@ -13,6 +14,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seenu.dev.android.vibeplayer.presentation.design_system.ScanInputsCard
 import com.seenu.dev.android.vibeplayer.presentation.design_system.VibePlayerNavIconButton
@@ -50,7 +53,9 @@ fun ScanMusicScreen(onNavigateUp: () -> Unit, onScanCompleted: (Int) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ScanInputsCard(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .widthIn(max = 400.dp)
+                    .fillMaxWidth(),
                 selectedSize = uiState.scanConfig.minSize,
                 selectedDuration = uiState.scanConfig.minDuration,
                 isScanning = uiState.scanState == ScanState.Scanning,

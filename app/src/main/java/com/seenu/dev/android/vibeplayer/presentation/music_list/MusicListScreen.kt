@@ -50,6 +50,7 @@ import com.seenu.dev.android.vibeplayer.R
 import com.seenu.dev.android.vibeplayer.presentation.design_system.MusicListCard
 import com.seenu.dev.android.vibeplayer.presentation.design_system.NoMusicFoundCard
 import com.seenu.dev.android.vibeplayer.presentation.design_system.ScanningMusicCard
+import com.seenu.dev.android.vibeplayer.presentation.design_system.dimension.LocalDimensions
 import com.seenu.dev.android.vibeplayer.presentation.model.TrackUiModel
 import com.seenu.dev.android.vibeplayer.presentation.shared_vm.ScanResultViewModel
 import com.seenu.dev.android.vibeplayer.presentation.theme.accent
@@ -229,17 +230,19 @@ private fun MusicListContent(
             tracks[it].id
         }) { index ->
             val musicItem = tracks[index]
+            val horizontalPadding =
+                LocalDimensions.current.musicListScreenDimensions.horizontalPadding
             MusicListCard(
                 track = musicItem,
                 modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 6.dp)
+                    .padding(horizontal = horizontalPadding / 2, vertical = 6.dp)
                     .clip(
                         MaterialTheme.shapes.medium
                     )
                     .clickable {
                         onClicked(musicItem)
                     }
-                    .padding(horizontal = 8.dp, vertical = 6.dp)
+                    .padding(horizontal = horizontalPadding / 2, vertical = 6.dp)
             )
             if (index != tracks.lastIndex) {
                 HorizontalDivider(
