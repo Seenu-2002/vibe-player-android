@@ -34,17 +34,20 @@ class MusicListViewModel constructor(
     private val markInitialTrackScanCompletedUseCase: MarkInitialTrackScanCompletedUseCase
 ) : ViewModel() {
 
+    private val _isScanning: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
     val musicListUiState: StateFlow<MusicListUiState> = combine(
         getScanConfigUseCase(),
-        repository.getAllScannedTracksFlow()
-    ) { scanConfig, tracks ->
+        repository.getAllScannedTracksFlow(),
+        _isScanning
+    ) { scanConfig, tracks, scanning ->
         loadMediaItemsToPlayerUseCase(tracks)
         val musicList = tracks.map { musicEntity ->
             musicEntity.toUiModel()
         }
         MusicListUiState(
             isLoading = false,
-            isScanning = false,
+            isScanning = scanning,
             musicList = musicList,
             scanConfig = scanConfig
         )
@@ -68,6 +71,7 @@ class MusicListViewModel constructor(
         viewModelScope.launch {
             when (intent) {
                 MusicListIntent.ScanMusicInDisk -> {
+                    _isScanning.emit(true)
                     val config = ScanMusicConfig(
                         minDurationInSeconds = 30,
                         minSizeInKb = 500
@@ -77,6 +81,7 @@ class MusicListViewModel constructor(
                     scanMusicUseCase(
                         config = config
                     )
+                    _isScanning.emit(false)
                 }
             }
         }
