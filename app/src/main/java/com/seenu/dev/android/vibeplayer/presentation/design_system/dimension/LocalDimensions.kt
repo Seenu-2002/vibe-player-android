@@ -10,7 +10,7 @@ val mobileDimensions = Dimension(
         horizontalPadding = 16.dp,
     ),
     musicPlayerScreenDimensions = MusicPlayerScreenDimensions(
-        horizontalPadding = 16.dp,
+        horizontalPadding = 8.dp,
     ),
 )
 
@@ -19,6 +19,6 @@ val tabletDimensions = Dimension(
         horizontalPadding = 24.dp,
     ),
     musicPlayerScreenDimensions = MusicPlayerScreenDimensions(
-        horizontalPadding = 60.dp,
+        horizontalPadding = 24.dp,
     ),
 )

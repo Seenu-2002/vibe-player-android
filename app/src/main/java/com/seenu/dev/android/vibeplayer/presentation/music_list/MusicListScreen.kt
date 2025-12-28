@@ -2,6 +2,9 @@ package com.seenu.dev.android.vibeplayer.presentation.music_list
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.AnimationScope
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -47,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seenu.dev.android.vibeplayer.R
+import com.seenu.dev.android.vibeplayer.presentation.design_system.MiniMusicPlayerScaffold
 import com.seenu.dev.android.vibeplayer.presentation.design_system.MusicListCard
 import com.seenu.dev.android.vibeplayer.presentation.design_system.NoMusicFoundCard
 import com.seenu.dev.android.vibeplayer.presentation.design_system.ScanningMusicCard
@@ -66,7 +70,10 @@ import timber.log.Timber
 @SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicListScreen(onPlay: (TrackUiModel) -> Unit, onScanMusic: () -> Unit) {
+fun SharedTransitionScope.MusicListScreen(
+    onPlay: (TrackUiModel) -> Unit,
+    onScanMusic: () -> Unit
+) {
 
     val viewModel: MusicListViewModel = koinViewModel()
     val scanResultViewModel: ScanResultViewModel = koinActivityViewModel()
@@ -103,7 +110,7 @@ fun MusicListScreen(onPlay: (TrackUiModel) -> Unit, onScanMusic: () -> Unit) {
         }
     }
 
-    Scaffold(
+    MiniMusicPlayerScaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
@@ -171,11 +178,10 @@ fun MusicListScreen(onPlay: (TrackUiModel) -> Unit, onScanMusic: () -> Unit) {
                 hostState = snackBarHostState,
             )
         }
-    ) { innerPadding ->
+    ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             when {

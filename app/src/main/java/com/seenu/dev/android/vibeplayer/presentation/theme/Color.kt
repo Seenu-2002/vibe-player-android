@@ -12,3 +12,4 @@ val Background = Color(0xFF0A131D)
 val Accent = Color(0xFFF1FF95)
 
 val Outline = Color(0xFF1A2735)
+val SurfaceHigher = Color(0xFF1A2735)

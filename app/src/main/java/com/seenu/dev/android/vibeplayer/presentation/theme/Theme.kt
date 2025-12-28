@@ -35,6 +35,9 @@ val ColorScheme.textDisabled: Color
 val ColorScheme.accent: Color
     get() = Accent
 
+val ColorScheme.surfaceHigher: Color
+    get() = SurfaceHigher
+
 @Composable
 fun VibePlayerTheme(
     content: @Composable () -> Unit
