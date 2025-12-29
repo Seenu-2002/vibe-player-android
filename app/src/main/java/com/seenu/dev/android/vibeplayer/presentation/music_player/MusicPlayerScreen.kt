@@ -73,7 +73,10 @@ private fun MusicPlayerScreenPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SharedTransitionScope.MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
+fun SharedTransitionScope.MusicPlayerScreen(
+    trackId: Long,
+    onNavigateUp: () -> Unit
+) {
     val viewModel: MusicPlayerViewModel = koinActivityViewModel()
     val uiState by viewModel.musicPlayerUiState.collectAsStateWithLifecycle()
     val trackState = uiState.trackState as? TrackUiState.Found?
@@ -129,7 +132,7 @@ fun SharedTransitionScope.MusicPlayerScreen(trackId: Long, onNavigateUp: () -> U
                         ),
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                         boundsTransform = { _, _ ->
-                            tween(1000)
+                            tween(500)
                         }
                     ),
                 placeholderPadding = PaddingValues(
@@ -142,14 +145,15 @@ fun SharedTransitionScope.MusicPlayerScreen(trackId: Long, onNavigateUp: () -> U
                 text = trackState?.track?.name ?: "<unknown>",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .sharedElement(
                         sharedContentState = rememberSharedContentState(
                             "track_title(${trackId})"
                         ),
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                         boundsTransform = { _, _ ->
-                            tween(1000)
+                            tween(500)
                         }
                     ),
                 overflow = TextOverflow.Ellipsis,
@@ -160,14 +164,15 @@ fun SharedTransitionScope.MusicPlayerScreen(trackId: Long, onNavigateUp: () -> U
                 text = trackState?.track?.artistName ?: "<unknown>",
                 style = MaterialTheme.typography.bodyMediumRegular,
                 color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .sharedElement(
                         sharedContentState = rememberSharedContentState(
                             "track_artist(${trackId})"
                         ),
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                         boundsTransform = { _, _ ->
-                            tween(1000)
+                            tween(500)
                         }
                     ),
                 overflow = TextOverflow.Ellipsis,
@@ -226,14 +231,15 @@ fun SharedTransitionScope.PlayerSeekBar(
             .padding(vertical = 16.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Slider(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .sharedElement(
                     sharedContentState = rememberSharedContentState(
                         "player_seekbar"
                     ),
                     animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                     boundsTransform = { _, _ ->
-                        tween(1000)
+                        tween(500)
                     }
                 ),
             value = currentDuration.toFloat(),
@@ -296,7 +302,7 @@ fun SharedTransitionScope.PlayerSeekBar(
                         ),
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                         boundsTransform = { _, _ ->
-                            tween(1000)
+                            tween(500)
                         }
                     ),
                 enabled = hasPrevious,
@@ -316,14 +322,15 @@ fun SharedTransitionScope.PlayerSeekBar(
             }
 
             IconButton(
-                modifier = Modifier.size(60.dp)
+                modifier = Modifier
+                    .size(60.dp)
                     .sharedElement(
                         sharedContentState = rememberSharedContentState(
                             "player_play_pause"
                         ),
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                         boundsTransform = { _, _ ->
-                            tween(1000)
+                            tween(500)
                         }
                     ),
                 onClick = {
@@ -353,7 +360,7 @@ fun SharedTransitionScope.PlayerSeekBar(
                         ),
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                         boundsTransform = { _, _ ->
-                            tween(1000)
+                            tween(500)
                         }
                     ),
                 enabled = hasNext,

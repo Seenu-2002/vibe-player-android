@@ -82,15 +82,15 @@ fun SharedTransitionScope.MiniMusicPlayer(
             track = track, modifier = Modifier
                 .size(64.dp)
                 .clip(MaterialTheme.shapes.small)
-                .sharedElement(
-                    sharedContentState = rememberSharedContentState(
-                        "track_image(${track.id})"
-                    ),
-                    animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-                    boundsTransform = { _, _ ->
-                        tween(1000)
-                    }
-                )
+//                .sharedElement(
+//                    sharedContentState = rememberSharedContentState(
+//                        "track_image(${track.id})"
+//                    ),
+//                    animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+//                    boundsTransform = { _, _ ->
+//                        tween(500)
+//                    }
+//                )
         )
 
         Column(
@@ -115,15 +115,16 @@ fun SharedTransitionScope.MiniMusicPlayer(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.fillMaxWidth()
-                            .sharedElement(
-                                sharedContentState = rememberSharedContentState(
-                                    "track_title(${track.id})"
-                                ),
-                                animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-                                boundsTransform = { _, _ ->
-                                    tween(1000)
-                                }
-                            ),
+//                            .sharedElement(
+//                                sharedContentState = rememberSharedContentState(
+//                                    "track_title(${track.id})"
+//                                ),
+//                                animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+//                                boundsTransform = { _, _ ->
+//                                    tween(500)
+//                                }
+//                            )
+                        ,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -133,15 +134,16 @@ fun SharedTransitionScope.MiniMusicPlayer(
                         style = MaterialTheme.typography.bodyMediumRegular,
                         color = MaterialTheme.colorScheme.onSecondary,
                         modifier = Modifier.fillMaxWidth()
-                            .sharedElement(
-                                sharedContentState = rememberSharedContentState(
-                                    "track_artist(${track.id})"
-                                ),
-                                animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-                                boundsTransform = { _, _ ->
-                                    tween(1000)
-                                }
-                            ),
+//                            .sharedElement(
+//                                sharedContentState = rememberSharedContentState(
+//                                    "track_artist(${track.id})"
+//                                ),
+//                                animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+//                                boundsTransform = { _, _ ->
+//                                    tween(500)
+//                                }
+//                            )
+                        ,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -155,7 +157,7 @@ fun SharedTransitionScope.MiniMusicPlayer(
                             ),
                             animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                             boundsTransform = { _, _ ->
-                                tween(1000)
+                                tween(500)
                             }
                         ),
                     onClick = {
@@ -186,7 +188,7 @@ fun SharedTransitionScope.MiniMusicPlayer(
                             ),
                             animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                             boundsTransform = { _, _ ->
-                                tween(1000)
+                                tween(500)
                             }
                         ),
                     onClick = {
@@ -215,7 +217,7 @@ fun SharedTransitionScope.MiniMusicPlayer(
                         ),
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                         boundsTransform = { _, _ ->
-                            tween(1000)
+                            tween(500)
                         }
                     ),
                 progress = { currentPos / track.duration.toFloat() },

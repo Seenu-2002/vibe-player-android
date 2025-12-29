@@ -225,7 +225,7 @@ fun SharedTransitionScope.MusicListScreen(
 }
 
 @Composable
-private fun MusicListContent(
+private fun SharedTransitionScope.MusicListContent(
     tracks: List<TrackUiModel>,
     listState: LazyListState,
     onClicked: (TrackUiModel) -> Unit,

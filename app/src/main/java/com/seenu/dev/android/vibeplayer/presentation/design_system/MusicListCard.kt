@@ -2,6 +2,8 @@ package com.seenu.dev.android.vibeplayer.presentation.design_system
 
 import android.content.ContentUris
 import android.provider.MediaStore
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -39,23 +42,25 @@ import com.seenu.dev.android.vibeplayer.presentation.theme.bodyMediumRegular
 @Preview
 @Composable
 private fun MusicListCardPreview() {
-    VibePlayerTheme {
-        val music = TrackUiModel(
-            id = 1L,
-            mediaId = 1L,
-            albumId = 1L,
-            name = "Song Title",
-            artistName = "Artist Name",
-            duration = 215000L,
-            durationLabel = "3:35",
-            filePath = ""
-        )
-        MusicListCard(track = music, modifier = Modifier.padding(16.dp))
+    SharedTransitionScope {
+        VibePlayerTheme {
+            val music = TrackUiModel(
+                id = 1L,
+                mediaId = 1L,
+                albumId = 1L,
+                name = "Song Title",
+                artistName = "Artist Name",
+                duration = 215000L,
+                durationLabel = "3:35",
+                filePath = ""
+            )
+            MusicListCard(track = music, modifier = Modifier.padding(16.dp))
+        }
     }
 }
 
 @Composable
-fun MusicListCard(track: TrackUiModel, modifier: Modifier = Modifier) {
+fun SharedTransitionScope.MusicListCard(track: TrackUiModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Row(
         modifier = modifier
@@ -67,6 +72,15 @@ fun MusicListCard(track: TrackUiModel, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(64.dp)
                 .clip(MaterialTheme.shapes.small)
+                .sharedElement(
+                    rememberSharedContentState(
+                        "track_image(${track.id})"
+                    ),
+                    animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                    boundsTransform = { _, _ ->
+                        tween(500)
+                    }
+                )
         )
         Column(
             modifier = Modifier
@@ -77,7 +91,17 @@ fun MusicListCard(track: TrackUiModel, modifier: Modifier = Modifier) {
                 text = track.name,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            "track_title(${track.id})"
+                        ),
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        boundsTransform = { _, _ ->
+                            tween(500)
+                        }
+                    ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -86,7 +110,17 @@ fun MusicListCard(track: TrackUiModel, modifier: Modifier = Modifier) {
                 text = track.artistName,
                 style = MaterialTheme.typography.bodyMediumRegular,
                 color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            "track_artist(${track.id})"
+                        ),
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        boundsTransform = { _, _ ->
+                            tween(500)
+                        }
+                    ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -100,7 +134,10 @@ fun MusicListCard(track: TrackUiModel, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MusicDefaultImageThumbnail(modifier: Modifier = Modifier, padding: PaddingValues= PaddingValues(14.dp)) {
+fun MusicDefaultImageThumbnail(
+    modifier: Modifier = Modifier,
+    padding: PaddingValues = PaddingValues(14.dp)
+) {
     val accent = MaterialTheme.colorScheme.accent
     Box(
         modifier = modifier
