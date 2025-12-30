@@ -39,7 +39,7 @@ class TrackSearchViewModel constructor(
         viewModelScope.launch {
             when (event) {
                 is TrackSearchEvent.OnQueryChange -> {
-                    val query = event.query.trim()
+                    val query = event.query
                     _uiState.value = _uiState.value.copy(query = query, isLoading = true)
                     searchQuery.emit(query)
                 }
