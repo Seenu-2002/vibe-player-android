@@ -1,7 +1,5 @@
 package com.seenu.dev.android.vibeplayer.presentation.music_player
 
-import android.R.attr.track
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -31,9 +29,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,10 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.seenu.dev.android.vibeplayer.R
-import com.seenu.dev.android.vibeplayer.presentation.design_system.MiniMusicPlayerScaffold
 import com.seenu.dev.android.vibeplayer.presentation.design_system.TrackImage
 import com.seenu.dev.android.vibeplayer.presentation.design_system.VibePlayerNavIconButton
 import com.seenu.dev.android.vibeplayer.presentation.design_system.dimension.LocalDimensions
+import com.seenu.dev.android.vibeplayer.domain.model.RepeatMode
 import com.seenu.dev.android.vibeplayer.presentation.theme.VibePlayerTheme
 import com.seenu.dev.android.vibeplayer.presentation.theme.bodyMediumRegular
 import com.seenu.dev.android.vibeplayer.presentation.theme.bodySmallRegular
@@ -59,7 +54,6 @@ import com.seenu.dev.android.vibeplayer.presentation.theme.buttonHover
 import com.seenu.dev.android.vibeplayer.presentation.theme.textDisabled
 import com.seenu.dev.android.vibeplayer.presentation.utils.toDurationLabel
 import org.koin.compose.viewmodel.koinActivityViewModel
-import org.koin.compose.viewmodel.koinViewModel
 
 @Preview
 @Composable
@@ -191,6 +185,8 @@ fun SharedTransitionScope.MusicPlayerScreen(
                 isPlaying = uiState.isPlaying,
                 hasNext = uiState.hasNext,
                 hasPrevious = uiState.hasPrevious,
+                isShuffled = uiState.isShuffleEnabled,
+                repeat = uiState.repeatMode,
                 onPlayPause = {
                     viewModel.onIntent(
                         if (it) MusicPlayerIntent.Play else MusicPlayerIntent.Pause
@@ -205,6 +201,12 @@ fun SharedTransitionScope.MusicPlayerScreen(
                 onSeekTo = {
                     viewModel.onIntent(MusicPlayerIntent.Seek(to = it))
                 },
+                onShuffleToggle = {
+                    viewModel.onIntent(MusicPlayerIntent.Shuffle(it))
+                },
+                onRepeatModeChange = {
+                    viewModel.onIntent(MusicPlayerIntent.ChangeRepeatMode(it))
+                },
                 modifier = Modifier
                     .fillMaxWidth()
             )
@@ -218,12 +220,16 @@ fun SharedTransitionScope.PlayerSeekBar(
     currentDuration: Long,
     totalDuration: Long,
     isPlaying: Boolean,
+    isShuffled: Boolean,
+    repeat: RepeatMode,
     hasNext: Boolean,
     hasPrevious: Boolean,
     onPlayPause: (Boolean) -> Unit,
     onNext: () -> Unit,
     onPrevious: () -> Unit,
     onSeekTo: (Long) -> Unit,
+    onRepeatModeChange: (RepeatMode) -> Unit,
+    onShuffleToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -294,6 +300,31 @@ fun SharedTransitionScope.PlayerSeekBar(
             modifier = Modifier, horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+
+            val (shuffleButtonColor, shuffleContentColor) = if (isShuffled) {
+                MaterialTheme.colorScheme.buttonHover to MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.buttonHover.copy(.28F) to MaterialTheme.colorScheme.textDisabled
+            }
+            IconButton(
+                modifier = Modifier,
+                onClick = {
+                    onShuffleToggle(!isShuffled)
+                },
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = shuffleButtonColor,
+                    contentColor = shuffleContentColor
+                )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_shuffle),
+                    contentDescription = "Shuffle",
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1F))
+
             IconButton(
                 modifier = Modifier
                     .sharedElement(
@@ -376,6 +407,37 @@ fun SharedTransitionScope.PlayerSeekBar(
                     painter = painterResource(R.drawable.ic_skip_next),
                     contentDescription = "Next",
                     modifier = Modifier.size(16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1F))
+
+            val (repeatButtonColor, repeatContentColor) = if (repeat != RepeatMode.NONE) {
+                MaterialTheme.colorScheme.buttonHover to MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.buttonHover.copy(.28F) to MaterialTheme.colorScheme.textDisabled
+            }
+            IconButton(
+                modifier = Modifier,
+                onClick = {
+                    onRepeatModeChange(repeat.next())
+                },
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = repeatButtonColor,
+                    contentColor = repeatContentColor
+                )
+            ) {
+                val iconRes = when (repeat) {
+                    RepeatMode.NONE -> R.drawable.ic_repeat_off
+                    RepeatMode.ALL -> R.drawable.ic_repeat
+                    RepeatMode.ONE -> R.drawable.ic_repeat_one
+                }
+
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = "Shuffle",
+                    modifier = Modifier.size(16.dp),
+                    tint = repeatContentColor
                 )
             }
         }

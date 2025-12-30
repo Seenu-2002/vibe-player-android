@@ -22,4 +22,7 @@ sealed interface Route : NavKey {
 
     data object ScanMusic : Route
 
+    @Serializable
+    data object TrackSearch : Route
+
 }

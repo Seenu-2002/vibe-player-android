@@ -12,4 +12,10 @@
     <string name="ignore_songs_less_than_duration_msg">Ignore duration less than</string>
     <string name="ignore_songs_less_than_size_msg">Ignore size less than</string>
     <string name="scan_results_message">Scan completed! %1$s songs found.</string>
+    <string name="songs_count">%1$d Songs</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="play">Play</string>
+    <string name="cancel">Cancel</string>
+    <string name="search">Search</string>
+    <string name="no_results_found">No results found</string>
 </resources>

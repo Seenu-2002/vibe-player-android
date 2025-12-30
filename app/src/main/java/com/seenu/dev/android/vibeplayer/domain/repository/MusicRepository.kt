@@ -13,6 +13,8 @@ interface MusicRepository {
 
     suspend fun getTrackById(trackId: Long): Track?
 
+    suspend fun searchTracksByNameOrArtist(query: String): List<Track>
+
     suspend fun updateScannedMusicList(musicList: List<Track>)
 
     suspend fun scan(

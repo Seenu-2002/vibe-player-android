@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ import com.seenu.dev.android.vibeplayer.presentation.music_player.MusicPlayerVie
 import com.seenu.dev.android.vibeplayer.presentation.music_player.TrackUiState
 import com.seenu.dev.android.vibeplayer.presentation.theme.surfaceHigher
 import org.koin.compose.viewmodel.koinActivityViewModel
+import timber.log.Timber
 
 @Composable
 fun SharedTransitionScope.MiniMusicPlayerScaffold(
@@ -33,21 +35,26 @@ fun SharedTransitionScope.MiniMusicPlayerScaffold(
     modifier: Modifier = Modifier,
     floatingActionButton: @Composable () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
-    content: @Composable (Boolean) -> Unit,
+    viewModel: MusicPlayerViewModel = koinActivityViewModel(),
+    content: @Composable BoxScope.(Boolean) -> Unit,
 ) {
-    val viewModel: MusicPlayerViewModel = koinActivityViewModel()
     val trackUiState by viewModel.musicPlayerUiState.collectAsStateWithLifecycle()
 
     val trackState = trackUiState.trackState as? TrackUiState.Found?
     val showMiniPlayer =
         trackUiState.isTrackLoaded && trackState != null && trackState.track != null
+    Timber.d("MiniMusicPlayerScaffold: showMiniPlayer=$showMiniPlayer")
 
     Scaffold(
         modifier = modifier,
         topBar = topBar,
         snackbarHost = snackbarHost,
-    ) {
-        Column(modifier = modifier.fillMaxSize()) {
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

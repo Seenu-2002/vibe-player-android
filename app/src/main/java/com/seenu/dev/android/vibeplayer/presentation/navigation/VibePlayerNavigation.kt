@@ -14,6 +14,7 @@ import com.seenu.dev.android.vibeplayer.presentation.music_list.MusicListScreen
 import com.seenu.dev.android.vibeplayer.presentation.music_player.MusicPlayerScreen
 import com.seenu.dev.android.vibeplayer.presentation.permission.PermissionScreen
 import com.seenu.dev.android.vibeplayer.presentation.scan_music_config.ScanMusicScreen
+import com.seenu.dev.android.vibeplayer.presentation.search.TrackSearchScreen
 import kotlin.collections.removeLastOrNull
 
 @Composable
@@ -44,15 +45,20 @@ fun VibePlayerNavigation(startRoute: Route) {
                                 backstack.add(route)
                             }, onScanMusic = {
                                 backstack.add(Route.ScanMusic)
+                            }, onSearch = {
+                                backstack.add(Route.TrackSearch)
                             })
                         }
                     }
 
                     is Route.MusicPlayer -> {
                         NavEntry(key) {
-                            MusicPlayerScreen(trackId = key.trackId, onNavigateUp = {
-                                backstack.removeLastOrNull()
-                            })
+                            MusicPlayerScreen(
+                                trackId = key.trackId,
+                                onNavigateUp = {
+                                    backstack.removeLastOrNull()
+                                },
+                            )
                         }
                     }
 
@@ -66,6 +72,14 @@ fun VibePlayerNavigation(startRoute: Route) {
                                     backstack.removeLastOrNull()
                                 }
                             )
+                        }
+                    }
+
+                    Route.TrackSearch -> {
+                        NavEntry(key) {
+                            TrackSearchScreen(onNavigateUp = {
+                                backstack.removeLastOrNull()
+                            })
                         }
                     }
 
