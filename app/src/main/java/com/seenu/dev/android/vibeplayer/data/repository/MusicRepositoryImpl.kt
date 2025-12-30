@@ -36,6 +36,10 @@ class MusicRepositoryImpl constructor(
         return database.musicDao.getTrackById(trackId)?.toDomain()
     }
 
+    override suspend fun searchTracksByNameOrArtist(query: String): List<Track> {
+        return database.musicDao.searchTracksByNameOrArtist(query).map { it.toDomain() }
+    }
+
     override suspend fun updateScannedMusicList(musicList: List<Track>) {
         return database.musicDao.updateAllInsertedTracks(musicList.map { it.toEntity() })
     }

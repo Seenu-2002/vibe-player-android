@@ -1,5 +1,6 @@
 package com.seenu.dev.android.vibeplayer.presentation.design_system
 
+import android.R.attr.contentDescription
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -11,7 +12,11 @@ import com.seenu.dev.android.vibeplayer.R
 import com.seenu.dev.android.vibeplayer.presentation.theme.buttonHover
 
 @Composable
-fun VibePlayerNavIconButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun VibePlayerNavIconButton(
+    onClick: () -> Unit,
+    iconRes: Int = R.drawable.ic_arrow_left,
+    modifier: Modifier = Modifier
+) {
     IconButton(
         onClick = onClick,
         modifier = modifier,
@@ -21,7 +26,7 @@ fun VibePlayerNavIconButton(onClick: () -> Unit, modifier: Modifier = Modifier) 
         )
     ) {
         Icon(
-            painter = painterResource(R.drawable.ic_arrow_left),
+            painter = painterResource(iconRes),
             contentDescription = "Back"
         )
     }

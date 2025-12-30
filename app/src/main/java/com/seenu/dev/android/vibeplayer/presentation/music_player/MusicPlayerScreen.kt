@@ -1,11 +1,9 @@
 package com.seenu.dev.android.vibeplayer.presentation.music_player
 
-import android.R.attr.track
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,11 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -34,45 +32,48 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.seenu.dev.android.vibeplayer.R
 import com.seenu.dev.android.vibeplayer.presentation.design_system.TrackImage
 import com.seenu.dev.android.vibeplayer.presentation.design_system.VibePlayerNavIconButton
 import com.seenu.dev.android.vibeplayer.presentation.design_system.dimension.LocalDimensions
-import com.seenu.dev.android.vibeplayer.presentation.model.TrackUiModel
+import com.seenu.dev.android.vibeplayer.domain.model.RepeatMode
 import com.seenu.dev.android.vibeplayer.presentation.theme.VibePlayerTheme
-import com.seenu.dev.android.vibeplayer.presentation.theme.accent
 import com.seenu.dev.android.vibeplayer.presentation.theme.bodyMediumRegular
+import com.seenu.dev.android.vibeplayer.presentation.theme.bodySmallRegular
 import com.seenu.dev.android.vibeplayer.presentation.theme.buttonHover
 import com.seenu.dev.android.vibeplayer.presentation.theme.textDisabled
-import org.koin.compose.viewmodel.koinViewModel
+import com.seenu.dev.android.vibeplayer.presentation.utils.toDurationLabel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Preview
 @Composable
 private fun MusicPlayerScreenPreview() {
     VibePlayerTheme {
-        MusicPlayerScreen(trackId = 121L, onNavigateUp = {})
+        SharedTransitionScope {
+            MusicPlayerScreen(trackId = 121L, onNavigateUp = {})
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
-    val viewModel: MusicPlayerViewModel = koinViewModel()
+fun SharedTransitionScope.MusicPlayerScreen(
+    trackId: Long,
+    onNavigateUp: () -> Unit
+) {
+    val viewModel: MusicPlayerViewModel = koinActivityViewModel()
     val uiState by viewModel.musicPlayerUiState.collectAsStateWithLifecycle()
     val trackState = uiState.trackState as? TrackUiState.Found?
-
-    BackHandler(true) {
-        viewModel.onIntent(MusicPlayerIntent.Pause)
-        onNavigateUp()
-    }
 
     LaunchedEffect(trackId) {
         viewModel.onIntent(
@@ -89,8 +90,8 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                 title = {},
                 navigationIcon = {
                     VibePlayerNavIconButton(
+                        iconRes = R.drawable.ic_chevron_down,
                         onClick = {
-                            viewModel.onIntent(MusicPlayerIntent.Pause)
                             onNavigateUp()
                         }
                     )
@@ -118,7 +119,16 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                     .widthIn(max = 320.dp)
                     .fillMaxWidth()
                     .aspectRatio(1F)
-                    .clip(MaterialTheme.shapes.small),
+                    .clip(MaterialTheme.shapes.small)
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            "track_image(${trackId})"
+                        ),
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        boundsTransform = { _, _ ->
+                            tween(500)
+                        }
+                    ),
                 placeholderPadding = PaddingValues(
                     70.dp
                 )
@@ -129,7 +139,17 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                 text = trackState?.track?.name ?: "<unknown>",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            "track_title(${trackId})"
+                        ),
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        boundsTransform = { _, _ ->
+                            tween(500)
+                        }
+                    ),
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
             )
@@ -138,7 +158,17 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                 text = trackState?.track?.artistName ?: "<unknown>",
                 style = MaterialTheme.typography.bodyMediumRegular,
                 color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            "track_artist(${trackId})"
+                        ),
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        boundsTransform = { _, _ ->
+                            tween(500)
+                        }
+                    ),
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
             )
@@ -155,6 +185,8 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                 isPlaying = uiState.isPlaying,
                 hasNext = uiState.hasNext,
                 hasPrevious = uiState.hasPrevious,
+                isShuffled = uiState.isShuffleEnabled,
+                repeat = uiState.repeatMode,
                 onPlayPause = {
                     viewModel.onIntent(
                         if (it) MusicPlayerIntent.Play else MusicPlayerIntent.Pause
@@ -169,6 +201,12 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
                 onSeekTo = {
                     viewModel.onIntent(MusicPlayerIntent.Seek(to = it))
                 },
+                onShuffleToggle = {
+                    viewModel.onIntent(MusicPlayerIntent.Shuffle(it))
+                },
+                onRepeatModeChange = {
+                    viewModel.onIntent(MusicPlayerIntent.ChangeRepeatMode(it))
+                },
                 modifier = Modifier
                     .fillMaxWidth()
             )
@@ -178,16 +216,20 @@ fun MusicPlayerScreen(trackId: Long, onNavigateUp: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerSeekBar(
+fun SharedTransitionScope.PlayerSeekBar(
     currentDuration: Long,
     totalDuration: Long,
     isPlaying: Boolean,
+    isShuffled: Boolean,
+    repeat: RepeatMode,
     hasNext: Boolean,
     hasPrevious: Boolean,
     onPlayPause: (Boolean) -> Unit,
     onNext: () -> Unit,
     onPrevious: () -> Unit,
     onSeekTo: (Long) -> Unit,
+    onRepeatModeChange: (RepeatMode) -> Unit,
+    onShuffleToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -195,7 +237,17 @@ fun PlayerSeekBar(
             .padding(vertical = 16.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Slider(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .sharedElement(
+                    sharedContentState = rememberSharedContentState(
+                        "player_seekbar"
+                    ),
+                    animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                    boundsTransform = { _, _ ->
+                        tween(500)
+                    }
+                ),
             value = currentDuration.toFloat(),
             onValueChange = {
                 onSeekTo(it.toLong())
@@ -206,7 +258,26 @@ fun PlayerSeekBar(
                 inactiveTrackColor = MaterialTheme.colorScheme.outline,
             ),
             thumb = {
-
+                val current = currentDuration.toDurationLabel()
+                val total = totalDuration.toDurationLabel()
+                Text(
+                    text = "$current / $total",
+                    color = MaterialTheme.colorScheme.surface,
+                    style = MaterialTheme.typography.bodySmallRegular,
+                    modifier = Modifier
+                        .dropShadow(
+                            shape = CircleShape,
+                            shadow = Shadow(
+                                color = Color(0x4D0A131D),
+                                radius = 4.dp,
+                            )
+                        )
+                        .background(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            shape = CircleShape
+                        )
+                        .padding(horizontal = 4.dp)
+                )
             },
             track = { state ->
                 SliderDefaults.Track(
@@ -214,7 +285,9 @@ fun PlayerSeekBar(
                         activeTrackColor = MaterialTheme.colorScheme.onPrimary,
                         inactiveTrackColor = MaterialTheme.colorScheme.outline,
                     ),
-                    modifier = Modifier.height(6.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp),
                     sliderState = state,
                     drawStopIndicator = null,
                     thumbTrackGapSize = 0.dp,
@@ -227,7 +300,42 @@ fun PlayerSeekBar(
             modifier = Modifier, horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+
+            val (shuffleButtonColor, shuffleContentColor) = if (isShuffled) {
+                MaterialTheme.colorScheme.buttonHover to MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.buttonHover.copy(.28F) to MaterialTheme.colorScheme.textDisabled
+            }
             IconButton(
+                modifier = Modifier,
+                onClick = {
+                    onShuffleToggle(!isShuffled)
+                },
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = shuffleButtonColor,
+                    contentColor = shuffleContentColor
+                )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_shuffle),
+                    contentDescription = "Shuffle",
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1F))
+
+            IconButton(
+                modifier = Modifier
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            "player_previous"
+                        ),
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        boundsTransform = { _, _ ->
+                            tween(500)
+                        }
+                    ),
                 enabled = hasPrevious,
                 onClick = onPrevious,
                 colors = IconButtonDefaults.iconButtonColors(
@@ -245,7 +353,17 @@ fun PlayerSeekBar(
             }
 
             IconButton(
-                modifier = Modifier.size(60.dp),
+                modifier = Modifier
+                    .size(60.dp)
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            "player_play_pause"
+                        ),
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        boundsTransform = { _, _ ->
+                            tween(500)
+                        }
+                    ),
                 onClick = {
                     onPlayPause(!isPlaying)
                 },
@@ -266,6 +384,16 @@ fun PlayerSeekBar(
             }
 
             IconButton(
+                modifier = Modifier
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            "player_next"
+                        ),
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        boundsTransform = { _, _ ->
+                            tween(500)
+                        }
+                    ),
                 enabled = hasNext,
                 onClick = onNext,
                 colors = IconButtonDefaults.iconButtonColors(
@@ -279,6 +407,37 @@ fun PlayerSeekBar(
                     painter = painterResource(R.drawable.ic_skip_next),
                     contentDescription = "Next",
                     modifier = Modifier.size(16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1F))
+
+            val (repeatButtonColor, repeatContentColor) = if (repeat != RepeatMode.NONE) {
+                MaterialTheme.colorScheme.buttonHover to MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.buttonHover.copy(.28F) to MaterialTheme.colorScheme.textDisabled
+            }
+            IconButton(
+                modifier = Modifier,
+                onClick = {
+                    onRepeatModeChange(repeat.next())
+                },
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = repeatButtonColor,
+                    contentColor = repeatContentColor
+                )
+            ) {
+                val iconRes = when (repeat) {
+                    RepeatMode.NONE -> R.drawable.ic_repeat_off
+                    RepeatMode.ALL -> R.drawable.ic_repeat
+                    RepeatMode.ONE -> R.drawable.ic_repeat_one
+                }
+
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = "Shuffle",
+                    modifier = Modifier.size(16.dp),
+                    tint = repeatContentColor
                 )
             }
         }

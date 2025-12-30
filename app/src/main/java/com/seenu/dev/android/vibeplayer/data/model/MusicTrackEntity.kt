@@ -17,6 +17,9 @@ data class MusicTrackEntity constructor(
         index = true
     )
     val path: String,
+    @ColumnInfo(
+        index = true
+    )
     val artist: String?,
     val albumId: Long,
     val album: String?,

@@ -22,6 +22,11 @@ interface MusicDao {
     suspend fun getScannedTracks(): List<MusicTrackEntity>
 
     @Query(
+        "SELECT * FROM music_track_table WHERE name LIKE '%' || :query || '%' OR artist LIKE '%' || :query || '%'"
+    )
+    suspend fun searchTracksByNameOrArtist(query: String): List<MusicTrackEntity>
+
+    @Query(
         "SELECT * FROM music_track_table LIMIT :count OFFSET :offset"
     )
     suspend fun getScannedTracks(offset: Int = 0, count: Int = 100): List<MusicTrackEntity>
@@ -29,7 +34,7 @@ interface MusicDao {
     @Query(
         "SELECT * FROM music_track_table WHERE id = :id LIMIT 1"
     )
-    suspend  fun getTrackById(id: Long): MusicTrackEntity?
+    suspend fun getTrackById(id: Long): MusicTrackEntity?
 
     @Transaction
     suspend fun updateAllInsertedTracks(tracks: List<MusicTrackEntity>) {

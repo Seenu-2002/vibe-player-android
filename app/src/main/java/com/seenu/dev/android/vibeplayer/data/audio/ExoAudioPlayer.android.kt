@@ -1,5 +1,6 @@
 package com.seenu.dev.android.vibeplayer.data.audio
 
+import android.R.attr.mode
 import android.content.Context
 import android.net.Uri
 import android.os.Looper
@@ -11,9 +12,10 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.util.EventLogger
 import com.seenu.dev.android.vibeplayer.domain.audio.AudioPlayer
 import com.seenu.dev.android.vibeplayer.domain.audio.PlaybackState
+import com.seenu.dev.android.vibeplayer.domain.model.RepeatMode
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.runBlocking
 import org.koin.core.annotation.Single
 import timber.log.Timber
@@ -35,11 +37,19 @@ class ExoAudioPlayer constructor(
                 addListener(object : Player.Listener {
                     override fun onEvents(player: Player, events: Player.Events) {
                         if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
-                            _playbackState.tryEmit(PlaybackState.TrackChange)
+                            _playbackState.trySend(PlaybackState.TrackChange)
                         }
 
                         if (events.contains(Player.EVENT_POSITION_DISCONTINUITY)) {
-                            _playbackState.tryEmit(PlaybackState.SeekbarJump)
+                            _playbackState.trySend(PlaybackState.SeekbarJump)
+                        }
+
+                        if (events.contains(Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED)) {
+                            _playbackState.trySend(PlaybackState.ShuffleModeChange)
+                        }
+
+                        if (events.contains(Player.EVENT_REPEAT_MODE_CHANGED)) {
+                            _playbackState.trySend(PlaybackState.RepeatModeChange)
                         }
                     }
 
@@ -50,18 +60,27 @@ class ExoAudioPlayer constructor(
                         } else {
                             PlaybackState.Paused
                         }
-                        _playbackState.tryEmit(state)
+                        _playbackState.trySend(state)
                     }
                 })
             }
     }
 
-    private val _playbackState: MutableStateFlow<PlaybackState> =
-        MutableStateFlow(PlaybackState.Paused)
-    override val playbackState: Flow<PlaybackState> = _playbackState.asStateFlow()
+    private val _playbackState: Channel<PlaybackState> = Channel(Channel.BUFFERED)
+    override val playbackState: Flow<PlaybackState> = _playbackState.receiveAsFlow()
 
     override val currentPositionMs: Long
         get() = player.currentPosition
+
+    override val isShuffleEnabled: Boolean
+        get() = player.shuffleModeEnabled
+
+    override val repeatMode: RepeatMode
+        get() = when (player.repeatMode) {
+            Player.REPEAT_MODE_ALL -> RepeatMode.ALL
+            Player.REPEAT_MODE_ONE -> RepeatMode.ONE
+            else -> RepeatMode.NONE
+        }
 
     override fun play() {
         Timber
@@ -149,6 +168,20 @@ class ExoAudioPlayer constructor(
     override fun getLoadedTracks(): List<MediaStore.Audio.Media> {
         Timber.d("Getting loaded tracks")
         return emptyList()
+    }
+
+    override fun shuffle(enable: Boolean) {
+        Timber.d("Setting shuffle mode to: $enable")
+        player.shuffleModeEnabled = enable
+    }
+
+    override fun changeRepeatMode(repeatMode: RepeatMode) {
+        Timber.d("Changing repeat mode to: $repeatMode")
+        player.repeatMode = when (repeatMode) {
+            RepeatMode.ALL -> Player.REPEAT_MODE_ALL
+            RepeatMode.ONE -> Player.REPEAT_MODE_ONE
+            RepeatMode.NONE -> Player.REPEAT_MODE_OFF
+        }
     }
 
     override fun release() {

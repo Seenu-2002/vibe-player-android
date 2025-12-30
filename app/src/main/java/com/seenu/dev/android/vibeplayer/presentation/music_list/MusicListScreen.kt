@@ -2,12 +2,16 @@ package com.seenu.dev.android.vibeplayer.presentation.music_list
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.AnimationScope
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,11 +51,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seenu.dev.android.vibeplayer.R
+import com.seenu.dev.android.vibeplayer.presentation.design_system.MiniMusicPlayerScaffold
 import com.seenu.dev.android.vibeplayer.presentation.design_system.MusicListCard
 import com.seenu.dev.android.vibeplayer.presentation.design_system.NoMusicFoundCard
 import com.seenu.dev.android.vibeplayer.presentation.design_system.ScanningMusicCard
+import com.seenu.dev.android.vibeplayer.presentation.design_system.ShuffleAndPlayButtonRow
 import com.seenu.dev.android.vibeplayer.presentation.design_system.dimension.LocalDimensions
 import com.seenu.dev.android.vibeplayer.presentation.model.TrackUiModel
+import com.seenu.dev.android.vibeplayer.presentation.music_player.MusicPlayerIntent
+import com.seenu.dev.android.vibeplayer.presentation.music_player.MusicPlayerViewModel
 import com.seenu.dev.android.vibeplayer.presentation.shared_vm.ScanResultViewModel
 import com.seenu.dev.android.vibeplayer.presentation.theme.accent
 import com.seenu.dev.android.vibeplayer.presentation.theme.bodyLargeMedium
@@ -66,9 +74,14 @@ import timber.log.Timber
 @SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicListScreen(onPlay: (TrackUiModel) -> Unit, onScanMusic: () -> Unit) {
+fun SharedTransitionScope.MusicListScreen(
+    onPlay: (TrackUiModel) -> Unit,
+    onScanMusic: () -> Unit,
+    onSearch: () -> Unit,
+) {
 
     val viewModel: MusicListViewModel = koinViewModel()
+    val playerViewModel: MusicPlayerViewModel = koinActivityViewModel()
     val scanResultViewModel: ScanResultViewModel = koinActivityViewModel()
     val uiState by viewModel.musicListUiState.collectAsStateWithLifecycle()
 
@@ -103,8 +116,9 @@ fun MusicListScreen(onPlay: (TrackUiModel) -> Unit, onScanMusic: () -> Unit) {
         }
     }
 
-    Scaffold(
+    MiniMusicPlayerScaffold(
         modifier = Modifier.fillMaxSize(),
+        viewModel = playerViewModel,
         topBar = {
             TopAppBar(
                 title = {
@@ -140,6 +154,20 @@ fun MusicListScreen(onPlay: (TrackUiModel) -> Unit, onScanMusic: () -> Unit) {
                             modifier = Modifier.size(16.dp)
                         )
                     }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        onClick = onSearch,
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.buttonHover,
+                            contentColor = MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_search),
+                            contentDescription = "Search Icon",
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
             )
         },
@@ -171,11 +199,10 @@ fun MusicListScreen(onPlay: (TrackUiModel) -> Unit, onScanMusic: () -> Unit) {
                 hostState = snackBarHostState,
             )
         }
-    ) { innerPadding ->
+    ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+                .matchParentSize(),
             contentAlignment = Alignment.Center
         ) {
             when {
@@ -203,14 +230,30 @@ fun MusicListScreen(onPlay: (TrackUiModel) -> Unit, onScanMusic: () -> Unit) {
                             modifier = Modifier.fillMaxWidth()
                         )
                     } else {
-                        MusicListContent(
-                            tracks = uiState.musicList,
-                            onClicked = {
-                                onPlay(it)
-                            },
-                            listState = trackListState,
-                            modifier = Modifier.matchParentSize()
-                        )
+                        Column(modifier = Modifier.matchParentSize()) {
+                            ShuffleAndPlayButtonRow(
+                                totalSongsCount = uiState.musicList.size,
+                                onShuffleAndPlay = {
+                                    playerViewModel.onIntent(MusicPlayerIntent.EnableShuffleAndPlay)
+                                },
+                                onPlay = {
+                                    playerViewModel.onIntent(MusicPlayerIntent.RevertShuffleAndPlayFromStart)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                            )
+                            MusicListContent(
+                                tracks = uiState.musicList,
+                                onClicked = {
+                                    onPlay(it)
+                                },
+                                listState = trackListState,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1F)
+                            )
+                        }
                     }
                 }
             }
@@ -219,9 +262,9 @@ fun MusicListScreen(onPlay: (TrackUiModel) -> Unit, onScanMusic: () -> Unit) {
 }
 
 @Composable
-private fun MusicListContent(
+fun SharedTransitionScope.MusicListContent(
     tracks: List<TrackUiModel>,
-    listState: LazyListState,
+    listState: LazyListState = rememberLazyListState(),
     onClicked: (TrackUiModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
