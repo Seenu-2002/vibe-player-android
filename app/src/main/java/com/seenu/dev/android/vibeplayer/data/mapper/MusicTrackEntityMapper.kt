@@ -6,7 +6,7 @@ import java.io.File
 
 fun MusicTrackEntity.toDomain(): Track {
     return Track(
-        id = this.id,
+        id = this.trackId,
         mediaId = this.musicId,
         name = this.name,
         filePath = path,
@@ -20,7 +20,7 @@ fun MusicTrackEntity.toDomain(): Track {
 
 fun Track.toEntity(): MusicTrackEntity {
     return MusicTrackEntity(
-        id = this.id,
+        trackId = this.id,
         musicId = this.mediaId,
         name = this.name,
         path = this.filePath,

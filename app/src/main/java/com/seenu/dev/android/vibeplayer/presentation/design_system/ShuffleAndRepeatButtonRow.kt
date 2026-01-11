@@ -53,7 +53,7 @@ fun ShuffleAndPlayButtonRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ShuffleAndPlayButton(
+            VibePlayerButton(
                 iconRes = R.drawable.ic_shuffle,
                 text = stringResource(R.string.shuffle),
                 onClick = onShuffleAndPlay,
@@ -61,7 +61,7 @@ fun ShuffleAndPlayButtonRow(
                     .weight(1f)
             )
 
-            ShuffleAndPlayButton(
+            VibePlayerButton(
                 iconRes = R.drawable.ic_play_outline,
                 text = stringResource(R.string.play),
                 onClick = onPlay,
@@ -76,41 +76,6 @@ fun ShuffleAndPlayButtonRow(
             text = stringResource(R.string.songs_count, totalSongsCount),
             style = MaterialTheme.typography.bodyLargeMedium,
             color = MaterialTheme.colorScheme.onSecondary
-        )
-    }
-}
-
-@Composable
-fun ShuffleAndPlayButton(
-    iconRes: Int,
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .clip(CircleShape)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = CircleShape
-            )
-            .clickable(onClick = onClick)
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = text,
-            tint = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.size(16.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyLargeMedium,
-            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }

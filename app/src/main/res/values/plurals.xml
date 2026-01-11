@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="playlist_quantity">
+        <item quantity="one">%d Playlist</item>
+        <item quantity="other">%d Playlists</item>
+    </plurals>
+    <plurals name="song_quantity">
+        <item quantity="one">%d Song</item>
+        <item quantity="other">%d Songs</item>
+    </plurals>
+    <plurals name="selected">
+        <item quantity="one">%d Selected Item</item>
+        <item quantity="other">%d Selected Items</item>
+    </plurals>
+</resources>

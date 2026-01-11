@@ -18,7 +18,8 @@ class AppModule {
             context,
             VibePlayerDatabase::class.java,
             "vibe_player_database.db"
-        ).build()
+        )
+            .build()
     }
 
 }

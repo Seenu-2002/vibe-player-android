@@ -87,7 +87,7 @@ class LocalMusicScanner constructor(
                         size = size,
                         path = dataPath,
                         duration = duration,
-                        id = i++
+                        trackId = i++
                     )
                 )
             }

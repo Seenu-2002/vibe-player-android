@@ -1,5 +1,6 @@
 package com.seenu.dev.android.vibeplayer.presentation.design_system
 
+import android.R.attr.track
 import android.content.ContentUris
 import android.provider.MediaStore
 import androidx.compose.animation.SharedTransitionScope
@@ -16,7 +17,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.RippleDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -61,7 +66,6 @@ private fun MusicListCardPreview() {
 
 @Composable
 fun SharedTransitionScope.MusicListCard(track: TrackUiModel, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
     Row(
         modifier = modifier
             .fillMaxWidth(),
@@ -121,6 +125,69 @@ fun SharedTransitionScope.MusicListCard(track: TrackUiModel, modifier: Modifier 
                             tween(500)
                         }
                     ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        Text(
+            text = track.durationLabel,
+            style = MaterialTheme.typography.bodyMediumRegular,
+            color = MaterialTheme.colorScheme.onSecondary
+        )
+    }
+}
+
+@Composable
+fun MusicListCardSelectionMode(
+    selected: Boolean,
+    track: TrackUiModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+
+        RadioButton(
+            selected = selected,
+            onClick = onClick,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSecondary
+            )
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        TrackImage(
+            track = track,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(MaterialTheme.shapes.small)
+        )
+        Column(
+            modifier = Modifier
+                .weight(1F)
+                .padding(12.dp), verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = track.name,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = track.artistName,
+                style = MaterialTheme.typography.bodyMediumRegular,
+                color = MaterialTheme.colorScheme.onSecondary,
+                modifier = Modifier
+                    .fillMaxWidth(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

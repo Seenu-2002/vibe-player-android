@@ -5,6 +5,7 @@ import com.seenu.dev.android.vibeplayer.data.mapper.toDomain
 import com.seenu.dev.android.vibeplayer.data.mapper.toEntity
 import com.seenu.dev.android.vibeplayer.data.model.MusicTrackEntity
 import com.seenu.dev.android.vibeplayer.data.source.LocalMusicScanner
+import com.seenu.dev.android.vibeplayer.domain.model.PlaylistWithSongsCount
 import com.seenu.dev.android.vibeplayer.domain.model.Track
 import com.seenu.dev.android.vibeplayer.domain.repository.MusicRepository
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +59,21 @@ class MusicRepositoryImpl constructor(
 
     override suspend fun deleteTrackByIds(vararg trackId: Long) {
         database.musicDao.deleteByIds(trackId.toList())
+    }
+
+    override fun getPlaylistsWithCountFlow(): Flow<List<PlaylistWithSongsCount>> {
+        return database.musicDao.getAllPlaylistsWithCountFlow()
+            .map { list -> list.map { it.toDomain() } }
+    }
+
+    override suspend fun createPlaylist(playlistName: String): Long {
+        return database.musicDao.createPlaylist(
+            playlistName = playlistName
+        )
+    }
+
+    override suspend fun isPlaylistExists(playlistName: String): Boolean {
+        return database.musicDao.isPlaylistExists(playlistName)
     }
 
 }
